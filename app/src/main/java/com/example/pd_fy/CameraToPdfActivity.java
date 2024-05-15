@@ -1,5 +1,6 @@
 package com.example.pd_fy;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -65,7 +66,6 @@ public class CameraToPdfActivity extends AppCompatActivity {
         // Check if the CAMERA permission is already granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             // Permission already granted, proceed with camera functionality
-            dispatchTakePictureIntent();
         } else {
             // Request the CAMERA permission
             requestCameraPermission();
@@ -85,10 +85,13 @@ public class CameraToPdfActivity extends AppCompatActivity {
     private void requestCameraPermission() {
         requestPermissionLauncher.launch(Manifest.permission.CAMERA);
     }
+    @SuppressLint("QueryPermissionsNeeded")
     private void dispatchTakePictureIntent() {
+
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Log.d(TAG, "Func entered");
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
             File photoFile = null;
             try {
                 photoFile = createImageFile();
@@ -96,7 +99,7 @@ public class CameraToPdfActivity extends AppCompatActivity {
                 ex.printStackTrace();
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "com.example.pd_fy.provider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
