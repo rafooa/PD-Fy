@@ -16,7 +16,7 @@
         android:theme="@style/Theme.PDFy"
         tools:targetApi="31">
         <activity
-            android:name=".startpage"
+            android:name=".PdfGalleryActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +29,7 @@
 <!--        <activity android:name=".loginp" />-->
         <activity android:name=".MainActivity" />
         <activity android:name=".signupp" />
-
+        <activity android:name=".startpage" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.pd_fy.provider"

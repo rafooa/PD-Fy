@@ -3,7 +3,7 @@
     android:id="@+id/fullscreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#947AC1">
+    android:background="#8057CA">
 
     <LinearLayout
         android:id="@+id/signInContainer"
@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
-        android:background="@android:color/black"
+        android:background="#000000"
         android:orientation="vertical"
         android:padding="20dp">
 
