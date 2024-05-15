@@ -1,18 +1,26 @@
 package com.example.pd_fy;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.Manifest;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.itextpdf.text.Document;
@@ -29,15 +37,39 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CameraToPdfActivity extends AppCompatActivity {
+    private static final String TAG = CameraToPdfActivity.class.getSimpleName();
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private ImageView imageView;
     private String currentPhotoPath;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 123;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.capture_picture);
+        // Register the permissions callback
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permission granted, proceed with camera functionality
+                        dispatchTakePictureIntent();
+                    } else {
+                        // Permission denied
+                        Toast.makeText(CameraToPdfActivity.this, "Camera permission is required to capture images.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        // Check if the CAMERA permission is already granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            // Permission already granted, proceed with camera functionality
+            dispatchTakePictureIntent();
+        } else {
+            // Request the CAMERA permission
+            requestCameraPermission();
+        }
 
         imageView = findViewById(R.id.imageView);
         Button captureButton = findViewById(R.id.captureButton);
@@ -45,13 +77,17 @@ public class CameraToPdfActivity extends AppCompatActivity {
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Capture Button Clicked");
                 dispatchTakePictureIntent();
             }
         });
     }
-
+    private void requestCameraPermission() {
+        requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+    }
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Log.d(TAG, "Func entered");
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
@@ -65,6 +101,8 @@ public class CameraToPdfActivity extends AppCompatActivity {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
+        else
+            Log.d(TAG, "No Camera App");
     }
 
     private File createImageFile() throws IOException {
