@@ -1,5 +1,14 @@
 package com.example.pd_fy;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,7 +44,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CameraToPdfActivity extends AppCompatActivity {
     private static final String TAG = CameraToPdfActivity.class.getSimpleName();
@@ -46,10 +59,24 @@ public class CameraToPdfActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 123;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
+    FirebaseAuth mAuth;
+
+
+    // Initialize FirebaseStorage instance
+    FirebaseStorage storage ;
+
+    // Get a reference to the root of the Firebase Storage
+    StorageReference storageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.capture_picture);
+
+         mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+
+
         // Register the permissions callback
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -66,6 +93,7 @@ public class CameraToPdfActivity extends AppCompatActivity {
         // Check if the CAMERA permission is already granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             // Permission already granted, proceed with camera functionality
+            dispatchTakePictureIntent();
         } else {
             // Request the CAMERA permission
             requestCameraPermission();
@@ -99,6 +127,7 @@ public class CameraToPdfActivity extends AppCompatActivity {
                 ex.printStackTrace();
             }
             if (photoFile != null) {
+               // Uri photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
                 Uri photoURI = FileProvider.getUriForFile(this, "com.example.pd_fy.provider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -130,6 +159,8 @@ public class CameraToPdfActivity extends AppCompatActivity {
     private void convertToPdf(Bitmap bitmap) {
         File pdfFile = generatePdfFile(bitmap);
         if (pdfFile != null) {
+
+            uploadPdfToStorage(pdfFile);
             Toast.makeText(this, "PDF created successfully", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Failed to create PDF", Toast.LENGTH_SHORT).show();
@@ -164,4 +195,169 @@ public class CameraToPdfActivity extends AppCompatActivity {
         }
         return pdfFile;
     }
+//    private void uploadPdfToStorage(File pdfFile) {
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            // Get the current user's email
+//            String userEmail = currentUser.getEmail();
+//
+//            // Create a reference to the folder with the user's email as its name
+//            StorageReference userFolderRef = storageRef.child(userEmail);
+//
+//            // Upload the PDF file to the user's folder in Firebase Storage
+//            StorageReference pdfRef = userFolderRef.child(pdfFile.getName());
+//
+//            // Upload the file
+//            pdfRef.putFile(Uri.fromFile(pdfFile))
+//                    .addOnSuccessListener(taskSnapshot -> {
+//                        Toast.makeText(CameraToPdfActivity.this, "PDF uploaded successfully", Toast.LENGTH_SHORT).show();
+//                    })
+//                    .addOnFailureListener(e -> {
+//                        Toast.makeText(CameraToPdfActivity.this, "Failed to upload PDF", Toast.LENGTH_SHORT).show();
+//                    });
+//        }
+//    }
+
+    // Create a method to upload the PDF file to Firebase Storage
+    private void uploadPdfToStorage(File pdfFile) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        // Create a reference to the PDF file in Firebase Storage
+        StorageReference pdfRef = storageRef.child(pdfFile.getName());
+
+        // Upload the PDF file to Firebase Storage
+        pdfRef.putFile(Uri.fromFile(pdfFile))
+                .addOnSuccessListener(taskSnapshot -> {
+                    // PDF uploaded successfully
+                    Toast.makeText(CameraToPdfActivity.this, "PDF uploaded successfully", Toast.LENGTH_SHORT).show();
+
+                    // Get the download URL of the uploaded PDF file
+                    pdfRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        // URL retrieved successfully
+                        String pdfUrl = uri.toString();
+
+                        // Store metadata and PDF URL in Firestore
+                        storePdfMetadataInFirestore(pdfFile.getName(), pdfUrl);
+                    }).addOnFailureListener(e -> {
+                        // Failed to retrieve the URL
+                        Toast.makeText(CameraToPdfActivity.this, "Failed to get PDF URL", Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    // Failed to upload PDF
+                    Toast.makeText(CameraToPdfActivity.this, "Failed to upload PDF", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+//    private void storePdfMetadataInFirestore(String pdfFileName, String pdfUrl) {
+//        // Get the current user's email or any unique identifier
+//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        if (currentUser != null) {
+//            String userEmail = currentUser.getEmail();
+//
+//            // Create a reference to the Firestore collection "pdf_metadata"
+//            FirebaseFirestore db = FirebaseFirestore.getInstance();
+//
+//            // Create a new document with the PDF metadata
+//            Map<String, Object> metadata = new HashMap<>();
+//            metadata.put("fileName", pdfFileName);
+//            metadata.put("downloadUrl", pdfUrl);
+//
+//            // Store the metadata in Firestore
+//            db.collection("users")
+//                    .document(userEmail)
+//                    .set(metadata)
+//                    .addOnSuccessListener(aVoid -> {
+//                        // Metadata stored in Firestore successfully
+//                        Toast.makeText(CameraToPdfActivity.this, "PDF metadata stored in Firestore", Toast.LENGTH_SHORT).show();
+//                    })
+//                    .addOnFailureListener(e -> {
+//                        // Failed to store metadata in Firestore
+//                        Toast.makeText(CameraToPdfActivity.this, "Failed to store PDF metadata in Firestore", Toast.LENGTH_SHORT).show();
+//                    });
+//        }
+//    }
+
+    private void storePdfMetadataInFirestore(String pdfFileName, String pdfUrl) {
+        // Get the current user's email or any unique identifier
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userEmail = currentUser.getEmail();
+
+            // Create a reference to the Firestore collection "pdf_metadata"
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            // Create a new document with the PDF metadata
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("fileName", pdfFileName);
+            metadata.put("downloadUrl", pdfUrl);
+
+            // Check if the user document exists in Firestore
+            DocumentReference userDocRef = db.collection("users").document(userEmail);
+            userDocRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // User document exists, update the arrays if they exist
+                        List<String> fileNames = (List<String>) document.get("fileNames");
+                        List<String> downloadUrls = (List<String>) document.get("downloadUrls");
+
+                        // Add the new metadata to the arrays
+                        if (fileNames == null) {
+                            fileNames = new ArrayList<>();
+                        }
+                        if (downloadUrls == null) {
+                            downloadUrls = new ArrayList<>();
+                        }
+
+                        // Add the filename and download URL to the arrays
+                        fileNames.add(pdfFileName);
+                        downloadUrls.add(pdfUrl);
+
+                        // Update the document with the new arrays
+                        userDocRef.update("fileNames", fileNames, "downloadUrls", downloadUrls)
+                                .addOnSuccessListener(aVoid -> {
+                                    // Metadata stored in Firestore successfully
+                                    Toast.makeText(CameraToPdfActivity.this, "PDF metadata stored in Firestore", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Failed to store metadata in Firestore
+                                    Toast.makeText(CameraToPdfActivity.this, "Failed to store PDF metadata in Firestore", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        // User document does not exist, create a new document with arrays
+                        List<String> fileNames = new ArrayList<>();
+                        List<String> downloadUrls = new ArrayList<>();
+
+                        // Add the filename and download URL to the arrays
+                        fileNames.add(pdfFileName);
+                        downloadUrls.add(pdfUrl);
+
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("fileNames", fileNames);
+                        userData.put("downloadUrls", downloadUrls);
+
+                        // Create the document with the arrays
+                        db.collection("users").document(userEmail)
+                                .set(userData)
+                                .addOnSuccessListener(aVoid -> {
+                                    // Metadata stored in Firestore successfully
+                                    Toast.makeText(CameraToPdfActivity.this, "PDF metadata stored in Firestore", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Failed to store metadata in Firestore
+                                    Toast.makeText(CameraToPdfActivity.this, "Failed to store PDF metadata in Firestore", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                } else {
+                    // Error getting document
+                    Log.d(TAG, "get failed with ", task.getException());
+                    Toast.makeText(CameraToPdfActivity.this, "Error getting document", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+
 }

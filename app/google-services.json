@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "364141734984",
+    "firebase_url": "https://pdfy-a5c92-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "pdfy-a5c92",
+    "storage_bucket": "pdfy-a5c92.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364141734984:android:39ce4686037d644fb23c7d",
+        "android_client_info": {
+          "package_name": "com.example.pd_fy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQaYCKtBra6SVRTRPNOzu_z_DU8pD6DQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
