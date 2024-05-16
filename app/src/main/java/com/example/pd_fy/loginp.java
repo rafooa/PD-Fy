@@ -1,6 +1,7 @@
 package com.example.pd_fy;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,6 +29,7 @@ public class loginp extends AppCompatActivity {
     private EditText rollNumberEditText;
     private EditText passwordEditText;
     private Button logInButton;
+    private Button backButton;
     private TextView signInText;
     //private ImageView illustrationImageView;
     private LinearLayout signInContainer;
@@ -44,6 +46,7 @@ public class loginp extends AppCompatActivity {
         rollNumberEditText = findViewById(R.id.rollNumberEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         logInButton = findViewById(R.id.logInButton);
+        backButton = findViewById(R.id.backButton);
         signInText = findViewById(R.id.signInText);
        // illustrationImageView = findViewById(R.id.startpic);
 
@@ -68,8 +71,16 @@ public class loginp extends AppCompatActivity {
                     // Your login authentication logic goes here
                     signIn();
                     // If login is successful, navigate to the second activity
-                    startActivity(new Intent(loginp.this, MainActivity.class));
-                   finish();
+                  //  startActivity(new Intent(loginp.this, PdfGalleryActivity.class));
+                   //finish();
+                }
+            });
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent intent = new Intent(loginp.this, startpage.class);
+                    startActivity(intent);
                 }
             });
 
@@ -115,7 +126,7 @@ public class loginp extends AppCompatActivity {
                         Log.d(TAG, "signInWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         // Proceed to the main activity
-                        startActivity(new Intent(loginp.this, page2.class));
+                        startActivity(new Intent(loginp.this, PdfGalleryActivity.class));
                         finish(); // Prevent going back to the login activity
                     } else {
                         // If sign in fails, display a message to the user.

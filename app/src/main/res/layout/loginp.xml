@@ -3,16 +3,16 @@
     android:id="@+id/fullscreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#8057CA">
+    android:background="@drawable/pdfylogo">
 
     <LinearLayout
         android:id="@+id/signInContainer"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
-        android:background="#000000"
+        android:background="@drawable/rounded_container_bg"
         android:orientation="vertical"
         android:padding="20dp">
 
@@ -23,15 +23,16 @@
             android:layout_gravity="center_horizontal"
             android:text="Sign In"
             android:textColor="@android:color/white"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/rollNumberEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/rounded_edit_text_bg"
-            android:hint="Roll Number i.e (171234)"
+            android:hint="E-mail"
             android:inputType="text"
             android:padding="10dp"
             android:textColorHint="@android:color/darker_gray" />
@@ -40,32 +41,37 @@
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/rounded_edit_text_bg"
             android:hint="Password"
             android:inputType="textPassword"
             android:padding="10dp"
             android:textColorHint="@android:color/darker_gray" />
 
-        <Button
-            android:id="@+id/logInButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
-            android:backgroundTint="#B49DDD"
-            android:text="Log In"
-            android:textColor="@android:color/black" />
+            android:layout_marginTop="40dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/logInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#947AC1"
+                android:text="Log In"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:backgroundTint="#947AC1"
+                android:text="Back"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
     </LinearLayout>
-
-    <!--    <ImageView-->
-    <!--        android:id="@+id/startpic"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_below="@id/signInContainer"-->
-    <!--        android:layout_centerHorizontal="true"-->
-    <!--        android:layout_marginTop="50dp"-->
-    <!--        android:src="@drawable/illustration" />-->
 
 </RelativeLayout>

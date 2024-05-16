@@ -64,8 +64,7 @@ public class signupp extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         signupButton = findViewById(R.id.SignupButton);
         signInText = findViewById(R.id.signInText);
-        confirmp = findViewById(R.id.confirmp);
-name = findViewById(R.id.name);
+        confirmp = findViewById(R.id.confirmPasswordEditText);
         // illustrationImageView = findViewById(R.id.startpic);
         FirebaseApp.initializeApp(this);
 
@@ -73,7 +72,7 @@ name = findViewById(R.id.name);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
 
-        myIntent = new Intent(this, MainActivity.class);
+        myIntent = new Intent(this, startpage.class);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -85,11 +84,10 @@ name = findViewById(R.id.name);
                 @Override
                 public void onClick(View v) {
                     signUp();
-                    startActivity(myIntent);
+                    //startActivity(myIntent);
                 }
             });
 
-        // Your Java code for handling login functionality goes here
     }
 
 
@@ -97,11 +95,18 @@ name = findViewById(R.id.name);
         final String email = emailEditText.getText().toString().trim();
         final String password = passwordEditText.getText().toString().trim();
         final String cp = confirmp.getText().toString().trim();
-        final String fullName = name.getText().toString().trim();
+        //final String fullName = name.getText().toString().trim();
 
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(cp)) {
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(cp))  {
             Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!password.equals(cp))
+        {
+            confirmp.setError("Passwords do not match.");
+            confirmp.requestFocus();
             return;
         }
 
@@ -128,13 +133,13 @@ name = findViewById(R.id.name);
                                // saveUserDataToFirestore( email, fullName);
                             }
                         } else {
-                            Toast.makeText(signupp.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(signupp.this, "Authentication failed.",
+                            //        Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
 
-        saveUserDataToFirestore( email, fullName);
+        saveUserDataToFirestore(email, "");
 
     }
     private void saveUserDataToFirestore(String email, String fullName) {
@@ -172,7 +177,7 @@ name = findViewById(R.id.name);
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(signupp.this, "User registered successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(signupp.this, MainActivity.class));
+                        startActivity(new Intent(signupp.this, startpage.class));
                         finish();
                     } else {
                         Log.e(TAG, "Error adding document: ", task.getException());

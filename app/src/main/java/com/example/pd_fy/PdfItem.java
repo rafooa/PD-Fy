@@ -15,4 +15,9 @@ public class PdfItem {
     public String getUrl() {
         return url;
     }
+
+    public void setName(String newName)
+    {
+        this.name = newName;
+    }
 }

@@ -93,7 +93,7 @@ public class CameraToPdfActivity extends AppCompatActivity {
         // Check if the CAMERA permission is already granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             // Permission already granted, proceed with camera functionality
-            dispatchTakePictureIntent();
+            //dispatchTakePictureIntent();
         } else {
             // Request the CAMERA permission
             requestCameraPermission();
@@ -132,11 +132,21 @@ public class CameraToPdfActivity extends AppCompatActivity {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
+            Button editButton = findViewById(R.id.editButton);
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToImageProcessing();
+                }
+            });
         }
         else
             Log.d(TAG, "No Camera App");
     }
-
+    private void navigateToImageProcessing() {
+        Intent intent = new Intent(this, ImageProcessing.class);
+        startActivity(intent);
+    }
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";

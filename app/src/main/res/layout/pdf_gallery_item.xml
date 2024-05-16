@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Replace "YOUR_PACKAGE_NAME" with your actual package name -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:background="@android:color/white"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/pdfNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <ImageView
+        android:id="@+id/deleteIconImageView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="Delete PDF"
+        android:src="@drawable/baseline_delete_24" />
+    <ImageView
+        android:id="@+id/editIconImageView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_toStartOf="@+id/deleteIconImageView"
+        android:layout_centerVertical="true"
+        android:contentDescription="Edit PDF"
+        android:src="@drawable/sharp_abc_24" />
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_marginTop="8dp" />
+        android:layout_below="@id/pdfNameTextView"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray" />
 
-</LinearLayout>
-
+</RelativeLayout>

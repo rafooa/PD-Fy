@@ -18,9 +18,8 @@ import android.widget.ImageButton;
 
 
 
-    public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    public class MainActivity extends AppCompatActivity {
         private Button nButton;
-        private Intent myIntent;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +31,10 @@ import android.widget.ImageButton;
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
                 return insets;
             });
-            myIntent = new Intent(this, CameraToPdfActivity.class);
-           // myIntent = new Intent(this, startpage.class);
-            nButton = findViewById(R.id.navButton);
-            nButton.setOnClickListener(this);
+           // myIntent = new Intent(this, CameraToPdfActivity.class);
+            Intent myIntent = new Intent(this, startpage.class);
+            startActivity(myIntent);
+
         }
 
-        @Override
-        public void onClick(View v) {
-            if (v.getId() == R.id.navButton)
-                startActivity(myIntent);
-        }
     }

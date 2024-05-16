@@ -21,6 +21,7 @@ public class startpage extends AppCompatActivity {
             public void onClick(View v) {
                 // Handle login button click, navigate to login activity or perform login operation
                 startActivity(new Intent(startpage.this, loginp.class));
+                finish();
             }
         });
 
